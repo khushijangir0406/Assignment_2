@@ -1,0 +1,80 @@
+---
+title: "Unicef_Data_Analysis"
+subtitle: "Quarto Report"
+author: "Khushi Jangir"
+date: "24/04/2024"
+format: 
+  html:
+    theme: solarized
+    backgroundcolor: darkblue
+---
+
+***"World Map of UNICEF Indicator Values"***
+**The graph titled "Global Distribution of UNICEF Indicator Values" presents a visual representation of the percentage of children (under age 5) with diarrhoea who received treatment across different regions of the world. This vital UNICEF indicator measures the proportion of young children who are provided with appropriate medical care for their diarrhoeal illness. The graph utilizes a world map, where each region is color-coded based on the percentage value. The color gradient, ranging from blue to red, indicates the varying levels of treatment coverage. Darker shades represent regions with higher treatment rates, while lighter shades depict regions where the treatment coverage is relatively lower. By merging the map data with the specific indicator values, this graph provides a comprehensive overview of the global distribution and discrepancies in the treatment provided to children with diarrhoea. It enables viewers to identify regions that excel in ensuring treatment access and pinpoint areas that require targeted interventions to improve healthcare outcomes for these children.**
+
+```{r}
+#libraries'
+library(maps)
+library(ggplot2)
+library(readr)
+
+unicef_indicator_2 <- read_csv("unicef_indicator_2.csv")
+unicef_metadata <- read_csv("unicef_metadata.csv")
+world_map <- map_data("world")
+
+# Merge the indicator data with the map data
+merged_data <- merge( world_map , unicef_indicator_2, by.x = "region", by.y = "country", all.x = TRUE)
+
+# Create the World Map chart
+ggplot() +
+  geom_map(data = merged_data, map = merged_data,
+           aes(x = long, y = lat, map_id = region, fill = obs_value),
+           color = "black") +
+  scale_fill_gradient(low = "blue", high = "red") +
+  theme_void()
+```
+
+***"Observed Value of UNICEF Indicator Across Countries"***
+**The "Observed Value of UNICEF Indicator Across Countries" bar chart provides valuable insights into the percentage of children under the age of 5 who received zinc treatment for diarrhea across different countries. This chart enables decision-makers to visually compare and evaluate the treatment coverage among nations, offering a comprehensive understanding of the variations and disparities in access to zinc treatment [1]. By analyzing the chart, decision-makers can identify countries with higher treatment coverage and potentially learn from their successful strategies, while also pinpointing areas that require targeted interventions and resource allocation to improve access to zinc treatment for diarrhea [1][2]. Additionally, the chart aids in the formulation of evidence-based policies and interventions to enhance treatment coverage and reduce the burden of diarrhea-related morbidity and mortality among young children globally.**
+
+```{r}
+# Create the Bar chart
+ggplot(unicef_indicator_2, aes(x = country, y = obs_value)) +
+  geom_bar(stat = "identity", fill = "maroon") +
+  xlab("Country") +
+  ylab("Observed Value") +
+  ggtitle("Bar Chart")
+```
+
+***"Trends in Zinc Treatment for Childhood Diarrhea: A Time-Series Analysis"***
+**The "Time-Series Chart" visually depicts the trends in the observed values of zinc treatment for childhood diarrhea over a specified time period. The chart utilizes a line graph to showcase the fluctuations in treatment coverage over time, allowing for the identification of patterns and changes in the provision of zinc treatment for diarrhea among children. The x-axis represents the time period, while the y-axis represents the observed values of zinc treatment coverage. This chart serves as a valuable tool for decision-makers to assess the effectiveness of interventions and policies implemented to combat childhood diarrhea and to monitor progress over time. By analyzing the chart, decision-makers can gain insights into the temporal variations in zinc treatment coverage, enabling them to formulate targeted strategies and interventions to improve access and ensure the effective management of childhood diarrhea.**
+
+```{r}
+# Create the Time-Series chart
+ggplot(unicef_indicator_2, aes(x = time_period, y = obs_value)) +
+  geom_line() +
+  xlab("Time Period") +
+  ylab("Observed Value") +
+  ggtitle("Time-Series Chart")
+```
+
+***"Relationship between Population and GDP per Capita: Scatter Plot with Linear Regression"***
+**The scatter plot with linear regression illustrates the relationship between the total population and the GDP per capita (constant 2015 US$) across various countries. The x-axis represents the population, while the y-axis represents the GDP per capita. Each data point on the scatter plot represents a country, allowing for a visual examination of the relationship between these two variables . The scatter plot also includes a line of best fit, represented by the red line, which indicates the linear regression model fitted to the data . This line represents the overall trend and direction of the relationship between population and GDP per capita. The scatter plot with linear regression provides valuable insights into how changes in population size may impact the economic well-being of a country [1]. It enables decision-makers to observe any positive or negative correlation between population and GDP per capita, aiding in the identification of patterns and potential factors influencing economic growth.**
+
+
+```{r}
+#Scatter plot
+x_col <- 'Population, total'
+y_col <- 'GDP per capita (constant 2015 US$)' 
+
+plot(unicef_metadata[[x_col]], unicef_metadata[[y_col]],  
+     xlab = x_col,  
+     ylab = y_col)
+
+# Fit linear regression
+lm <- lm(unicef_metadata[[y_col]] ~ unicef_metadata[[x_col]])
+
+abline(lm, col = "yellow")
+title("Scatter plot with linear regression")
+```
+
